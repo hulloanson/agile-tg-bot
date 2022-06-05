@@ -1,6 +1,6 @@
 # Agile TG bot
 
-A telegram bot to streamline day-to-day agile operations
+A telegram bot to streamline day-to-day agile operations and also used to learn rust code.
 
 ## Planned features
 
