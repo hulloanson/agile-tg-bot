@@ -57,8 +57,24 @@ impl fmt::Display for HashTagMatcher {
     }
 }
 
-struct NotionPage {
-    id: String,
+#[async_trait]
+trait Destination {
+    async fn insert(&self, text: &String);
+}
+
+// struct NotionPage {
+//     api: &NotionApi,
+//     id: String,
+// }
+
+#[async_trait]
+impl Destination for NotionPage {
+    async fn insert(&self, text: &String) {
+        info!(
+            "properties: {}",
+            self.properties.title().unwrap_or("".to_string())
+        );
+    }
 }
 
 enum DestinationType {
