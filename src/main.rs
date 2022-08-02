@@ -129,12 +129,13 @@ async fn main() {
             Ok(updates) => {
                 let len = updates.len();
                 if len > 0 {
-                    latest_update = updates
+                    latest_update = match updates
                         .iter()
                         .reduce(|acc, u| if acc.id > u.id { acc } else { u })
-                        .unwrap()
-                        .id
-                        + 1;
+                    {
+                        Some(update) => update.id + 1,
+                        _ => latest_update,
+                    };
                     handle_updates(updates);
                 }
             }
