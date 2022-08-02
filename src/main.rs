@@ -1,12 +1,13 @@
 use core::fmt;
+use std::fmt::Debug;
+use std::io::Error;
 
-use log::info;
+use async_trait::async_trait;
+use log::{debug, info};
+use notion::models::Page as NotionPage;
+use notion::NotionApi;
 use teloxide::types::{MessageEntity, MessageEntityKind, UpdateKind};
 use teloxide::{prelude::*, RequestError};
-
-// fn has_hashtags(hashtags: &[str]) -> () {
-
-// }
 
 macro_rules! unpack {
     ($x: expr, $variant:path, $otherwise:expr) => {
@@ -99,7 +100,7 @@ fn standup_matcher(text: &&str) -> impl Fn(&&MessageEntity) -> bool {
 }
 
 fn handle_updates(updates: Vec<Update>) -> () {
-    info!("No errors. Got {} updates.", updates.len());
+    info!("Got {} updates.", updates.len());
     for update in updates {
         info!("Received update id {}: ", update.id);
         let kind = update.kind;
@@ -109,6 +110,10 @@ fn handle_updates(updates: Vec<Update>) -> () {
             };
             if matcher.match_message(&message) {
                 info!("Found matched message with {}", matcher);
+                // store this message to notion
+                // first print this whole thing out.
+                let text = unpack!(message.text(), Some, return);
+                debug!("Matched message text: {}", text)
             }
         }
     }
@@ -117,7 +122,7 @@ fn handle_updates(updates: Vec<Update>) -> () {
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
-    log::info!("Starting throw dice bot...");
+    log::info!("Starting agile tg bot...");
 
     let bot = Bot::from_env();
 
@@ -138,6 +143,7 @@ async fn main() {
             Err(ref err) => {
                 if let RequestError::Network(_) = err {
                     // ignore network error
+                    info!("Failed to get update from Telegram because of network error.");
                 } else {
                     info!("Failed to get update from Telegram. Error: {}", err);
                 }
